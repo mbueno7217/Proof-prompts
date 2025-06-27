@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Proof‑Feedback Prompt Generator</title>
+  <!-- Tailwind CSS via CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    textarea {
+      font-family: ui-monospace, monospace;
+    }
+  </style>
+</head>
+<body class="bg-gray-50 text-slate-800 leading-relaxed">
+  <div class="max-w-4xl mx-auto p-6">
+    <h1 class="text-3xl font-bold mb-4">ChatGPT Prompt Toolkit for Proof Feedback &amp; Grading</h1>
+    <p class="mb-8">Copy any template below, replace the bracketed placeholders with your content, and paste it into ChatGPT.</p>
+
+    <!-- Reusable component -->
+    <template id="promptCard">
+      <div class="border rounded-2xl shadow-sm mb-6 bg-white">
+        <div class="flex items-center justify-between px-6 py-4 cursor-pointer toggle">
+          <h2 class="font-semibold text-lg title"></h2>
+          <svg class="w-5 h-5 transition-transform duration-200 arrow" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg>
+        </div>
+        <div class="content px-6 pb-6 hidden">
+          <textarea class="w-full p-3 border rounded-md resize-none text-sm promptText" rows="10" readonly></textarea>
+          <button class="mt-3 px-4 py-2 rounded-md bg-blue-600 text-white copyBtn">Copy&nbsp;Prompt</button>
+        </div>
+      </div>
+    </template>
+
+    <!-- Container for generated cards -->
+    <div id="promptContainer"></div>
+  </div>
+
+  <script>
+    const prompts = [
+      {
+        title: "1. Quick Logical Soundness Check",
+        text: `Here is a proof draft. First, ignore writing quality and focus only on logical correctness.\n  1. List any steps that are not fully justified or that depend on a hidden assumption.\n  2. Point out any statements that are outright false.\n  3. Suggest a fix (one sentence) for each issue you find.\n***Proof:***\n\`\`\`latex\n[insert proof here]\n\`\`\``,
+      },
+      {
+        title: "2. Deep Line-by-Line Proof Review",
+        text: `Act as a meticulous referee for an undergraduate mathematics journal. For each numbered line of my proof:\n  - Explain why the line is correct, or\n  - If it is incorrect, clearly state that and explain the problem.\nFinish with a summary of the main logical gaps you found.\n***Proof:***\n1. ...\n2. ...\n3. ...`,
+      },
+      {
+        title: "3. Clarity & Readability Audit",
+        text: `Pretend you are coaching a peer about to present this proof to classmates who have taken one semester of real analysis.\n  1. Highlight sentences that are difficult to read or too terse.\n  2. Rewrite each highlighted sentence in a clearer style, preserving mathematical precision.\n  3. Identify any jargon that needs a brief reminder of its meaning.\n***Proof:***\n...`,
+      },
+      {
+        title: "4. Style & LaTeX Conventions",
+        text: `Evaluate my proof for LaTeX best practices and mathematical writing style.\n  - Convert inline math to display math if appropriate.\n  - Standardize theorem/lemma tags.\n  - Replace ASCII arrows or informal symbols with proper LaTeX commands.\nProvide the revised code block only.\n***Proof:***\n\`\`\`latex\n...\n\`\`\``,
+      },
+      {
+        title: "5. Suggesting Alternate Proof Strategies",
+        text: `After reviewing the correctness of my proof, suggest one alternative approach that:\n  - Relies on a different core idea (e.g., induction → contradiction).\n  - Might be shorter or illuminate an interesting side result.\nThen briefly outline that alternative proof.`,
+      },
+      {
+        title: "6. \"Explain It Back to Me\" Understanding Test",
+        text: `Read my proof. Without citing it directly, restate the argument in your own words at a level suitable for a talented first-year undergraduate. If you find any logical leaps while restating, flag them.`,
+      },
+      {
+        title: "7. Final Polishing & Tone Adjustment",
+        text: `Polish the following proof so that it matches the tone of Spivak’s Calculus — rigorous yet conversational. Keep all logical content identical.\n***Proof:***\n...`,
+      },
+      {
+        title: "8. Grading a Mathematical Proof",
+        text: `Act as an expert mathematics professor grading a student's answer.\nHere is the problem statement:\n[insert problem statement here]\n\nHere is the student's answer/proof:\n\`\`\`latex\n[insert student's solution here]\n\`\`\`\n\nGrade the answer on a scale from 0 to 10 based on the following criteria:\n- Correctness and logical rigor (5 points)\n- Clarity and readability (3 points)\n- Mathematical notation and formatting (2 points)\n\nFor each criterion, justify the score assigned and clearly state the final grade.`,
+      },
+    ];
+
+    const container = document.getElementById("promptContainer");
+    const template = document.getElementById("promptCard").content;
+
+    prompts.forEach((p) => {
+      const clone = template.cloneNode(true);
+      clone.querySelector(".title").textContent = p.title;
+      clone.querySelector(".promptText").value = p.text;
+      const toggle = clone.querySelector(".toggle");
+      const content = clone.querySelector(".content");
+      const arrow = clone.querySelector(".arrow");
+      toggle.addEventListener("click", () => {
+        content.classList.toggle("hidden");
+        arrow.classList.toggle("rotate-180");
+      });
+      clone.querySelector(".copyBtn").addEventListener("click", () => {
+        navigator.clipboard.writeText(p.text).then(() => {
+          alert("Prompt copied to clipboard!");
+        });
+      });
+      container.appendChild(clone);
+    });
+  </script>
+</body>
+</html>
